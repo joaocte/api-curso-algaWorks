@@ -1,5 +1,8 @@
 package com.example.algamoney.api.token;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,14 +40,22 @@ public class RefreshTokenPostProcessor implements ResponseBodyAdvice<OAuth2Acces
 		
 		HttpServletRequest req = ((ServletServerHttpRequest) request).getServletRequest();
 		HttpServletResponse resp = ((ServletServerHttpResponse) response).getServletResponse();
-		
 		DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) body;
 		
 		String refreshToken = body.getRefreshToken().getValue();
 		adicionarRefreshTokenNoCookie(refreshToken, req, resp);
 		removerRefreshTokenDoBody(token);
 		
+		removerNomeDoUsuarioDoBody(token);
+		
 		return body;
+	}
+
+	private void removerNomeDoUsuarioDoBody(DefaultOAuth2AccessToken token) {
+		Map<String, Object> addInfo = new HashMap<>();
+		addInfo.put("nome", null);
+		token.setAdditionalInformation(addInfo);
+		
 	}
 
 	private void removerRefreshTokenDoBody(DefaultOAuth2AccessToken token) {
